@@ -1,0 +1,15 @@
+server:
+  port: 1300
+  servlet:
+    context-path: /tastey-town
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/tastey-town
+    username: root
+    password: root2004
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
