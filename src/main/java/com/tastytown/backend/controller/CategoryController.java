@@ -14,13 +14,13 @@ import com.tastytown.backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/catagories")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
      private final CategoryService categoryService;
     
     @PostMapping
-    public ResponseEntity<Category> createCatagory(@RequestBody CategoryRequestDTO requestDto) {
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryRequestDTO requestDto) {
 
         return new ResponseEntity<>(categoryService.saveCategory(requestDto), HttpStatus.CREATED);
     }
