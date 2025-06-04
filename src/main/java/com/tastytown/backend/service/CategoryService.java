@@ -10,6 +10,7 @@ import com.tastytown.backend.exception.CategoryNotFoundException;
 import com.tastytown.backend.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.var;
 
 @Service
 @RequiredArgsConstructor
@@ -31,4 +32,16 @@ public class CategoryService {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + categoryId));
     }
+
+    public Category updateCategoryById(String categoryId, CategoryRequestDTO requestDTO) {
+        var existingCategory = getCategoryById(categoryId);
+        existingCategory.setCategoryName(requestDTO.getCategoryName());
+        return categoryRepository.save(existingCategory);
+    }
+    
+    public void deleteCategoryById(String categoryId) {
+        var category = getCategoryById(categoryId);
+        categoryRepository.delete(category);
+    }
+
 }
