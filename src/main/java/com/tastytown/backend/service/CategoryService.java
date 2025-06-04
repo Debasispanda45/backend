@@ -1,5 +1,7 @@
 package com.tastytown.backend.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.tastytown.backend.dto.CategoryRequestDTO;
@@ -18,5 +20,9 @@ public Category saveCategory(CategoryRequestDTO requestDTO) {
                 .categoryName(requestDTO.getCategoryName())
                 .build();
        return categoryRepository.save(category);
+    }
+
+    public List<Category> findAllCategories() {
+        return categoryRepository.findAll();
     }
 }
