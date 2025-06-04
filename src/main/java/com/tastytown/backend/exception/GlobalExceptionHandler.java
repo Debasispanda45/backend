@@ -11,10 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-     @ExceptionHandler(CategoryNotFoundException.class)
+    @ExceptionHandler(CategoryNotFoundException.class)
     public ProblemDetail handleNoSuchElementException(CategoryNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
 

@@ -28,6 +28,7 @@ public class CategoryService {
     }
 
     public Category getCategoryById(String categoryId) {
-        return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + categoryId));
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + categoryId));
     }
 }
