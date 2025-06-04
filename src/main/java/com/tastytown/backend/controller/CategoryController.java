@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,12 +39,19 @@ public class CategoryController {
     @ApiResponse(responseCode = "200", description = "Fetched all categories successfully")
     @Operation(summary = "Get all categories", description = "This endpoint returns a list of all categories in the system.")
     // public ResponseEntity<List<Category>> getAllCategories() {
-    //     List<Category> categories = categoryService.getAllCategories();
-    //     // return ResponseEntity.ok(categories);
-    //     return new ResponseEntity<>(categories, HttpStatus.OK);
+    // List<Category> categories = categoryService.getAllCategories();
+    // // return ResponseEntity.ok(categories);
+    // return new ResponseEntity<>(categories, HttpStatus.OK);
     // }
     public List<Category> getAllCategories() {
         return categoryService.findAllCategories();
+    }
+
+    @GetMapping("/{categoryId}")
+    @ApiResponse(description = "Get category by ID")
+    @Operation(summary = "Get all categories", description = "This endpoint returns a list of all categories in the system.")
+    public Category getCategoryById(@PathVariable String categoryId) {
+        return categoryService.getCategoryById(categoryId);
     }
 
 }
