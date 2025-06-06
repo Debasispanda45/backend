@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tastytown.backend.dto.CategoryRequestDTO;
 import com.tastytown.backend.entity.Category;
-import com.tastytown.backend.service.CategoryService;
+import com.tastytown.backend.service.ICategoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Category API", description = "Operations related to categories")
 public class CategoryController {
-    private final CategoryService categoryService;
+    private final ICategoryService categoryService;
 
     @PostMapping
     @ApiResponse(responseCode = "201", description = "Category created successfully")
@@ -68,9 +68,11 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     @ApiResponse(responseCode = "204", description = "Category deleted successfully")
+    // @ApiResponse(responseCode = "404", description = "Category not found")
     @Operation(summary = "Delete category by ID", description = "This endpoint deletes a category by its ID.")
-    public void deleteCategoryById(@PathVariable String categoryId) {
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable String categoryId) {
         categoryService.deleteCategoryById(categoryId);
+        return ResponseEntity.noContent().build();
     }
 
 }
