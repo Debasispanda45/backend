@@ -27,7 +27,7 @@ public class Food {
 
     private String foodDescription;
 
-    private double price;
+    private double foodPrice;
 
     private String foodImage;
 
