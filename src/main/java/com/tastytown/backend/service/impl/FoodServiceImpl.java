@@ -106,4 +106,28 @@ public class FoodServiceImpl implements IFoodService {
         return foodPage.map(FoodMapper::convertToDTO);
     }
 
+    @Override
+    public FoodResponseDTO deleteFoodById(String foodId) throws IOException{
+        var food = foodRepository.findById(foodId)
+                .orElseThrow(() -> new NoSuchElementException("Food Not Found with Id: " + foodId));
+        deleteFoodImage(food.getFoodImage());
+        foodRepository.delete(food);
+
+        return FoodMapper.convertToDTO(food);
+    }
+
+    private void deleteFoodImage(String foodImageName) throws IOException{
+        var file = new File(FILE_DIR + File.separator + foodImageName);
+        if (!file.exists()) {
+            throw new FileNotFoundException("Food Image Not Found");
+        }
+        file.delete();
+    }
+
+    @Override
+    public FoodResponseDTO updateFoodById(String foodId, FoodRequestDTO dto, MultipartFile foodImage)
+            throws IOException {
+        
+    }
+
 }
