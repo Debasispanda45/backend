@@ -130,13 +130,9 @@ public class FoodServiceImpl implements IFoodService {
         var food = foodRepository.findById(foodId)
                 .orElseThrow(() -> new NoSuchElementException("Food Not Found with Id: " + foodId));
 
-        var category = categoryService.getCategoryById(dto.categoryId());
-
         food.setFoodName(dto.foodName());
         food.setFoodPrice(dto.foodPrice());
         food.setFoodDescription(dto.foodDescription());
-        food.setCategory(category);
-        
         if (dto.categoryId() != null && !dto.categoryId().isEmpty()) {
             var catgeory = categoryService.getCategoryById(dto.categoryId());
             food.setCategory(catgeory);
