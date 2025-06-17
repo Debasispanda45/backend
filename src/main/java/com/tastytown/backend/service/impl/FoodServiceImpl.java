@@ -107,7 +107,7 @@ public class FoodServiceImpl implements IFoodService {
     }
 
     @Override
-    public FoodResponseDTO deleteFoodById(String foodId) throws IOException{
+    public FoodResponseDTO deleteFoodById(String foodId) throws IOException {
         var food = foodRepository.findById(foodId)
                 .orElseThrow(() -> new NoSuchElementException("Food Not Found with Id: " + foodId));
         deleteFoodImage(food.getFoodImage());
@@ -116,7 +116,7 @@ public class FoodServiceImpl implements IFoodService {
         return FoodMapper.convertToDTO(food);
     }
 
-    private void deleteFoodImage(String foodImageName) throws IOException{
+    private void deleteFoodImage(String foodImageName) throws IOException {
         var file = new File(FILE_DIR + File.separator + foodImageName);
         if (!file.exists()) {
             throw new FileNotFoundException("Food Image Not Found");
@@ -127,7 +127,28 @@ public class FoodServiceImpl implements IFoodService {
     @Override
     public FoodResponseDTO updateFoodById(String foodId, FoodRequestDTO dto, MultipartFile foodImage)
             throws IOException {
+        var food = foodRepository.findById(foodId)
+                .orElseThrow(() -> new NoSuchElementException("Food Not Found with Id: " + foodId));
+
+        var category = categoryService.getCategoryById(dto.categoryId());
+
+        food.setFoodName(dto.foodName());
+        food.setFoodPrice(dto.foodPrice());
+        food.setFoodDescription(dto.foodDescription());
+        food.setCategory(category);
         
+        if (dto.categoryId() != null && !dto.categoryId().isEmpty()) {
+            var catgeory = categoryService.getCategoryById(dto.categoryId());
+            food.setCategory(catgeory);
+        }
+
+        if (foodImage != null && !foodImage.isEmpty()) {
+            deleteFoodImage(food.getFoodImage());
+            var newFoodImageName = uploadFile(foodImage);
+            food.setFoodImage(newFoodImageName);
+        }
+        var savedFood = foodRepository.save(food);
+        return FoodMapper.convertToDTO(savedFood);
     }
 
 }
