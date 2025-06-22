@@ -47,6 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+            request.setAttribute("userId", userId);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             var problemDetail = org.springframework.http.ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
