@@ -9,6 +9,8 @@ import com.tastytown.backend.dto.CartItemRequestDTO;
 import com.tastytown.backend.dto.CartResponseDTO;
 import com.tastytown.backend.entity.Cart;
 import com.tastytown.backend.entity.CartItem;
+import com.tastytown.backend.entity.Food;
+import com.tastytown.backend.entity.User;
 import com.tastytown.backend.mapper.CartMapper;
 import com.tastytown.backend.repository.CartRepository;
 import com.tastytown.backend.repository.FoodRepository;
@@ -26,15 +28,9 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public CartResponseDTO addItemToCart(String userId, CartItemRequestDTO cartItemRequestDTO) {
-        var user = userRepository.findById(userId).orElseThrow();
-
-        var cart = cartRepository.findByUser(user).orElseGet(
-                () -> {
-                    var newCart = Cart.builder().user(user).build();
-                    return cartRepository.save(newCart);
-                });
-
-        var food = foodRepository.findById(cartItemRequestDTO.foodId()).orElseThrow();
+        var user = getUserById(userId);
+        var cart = getOrCreateCartForUser(user);
+        var food = getFoodById(cartItemRequestDTO.foodId());
 
         // check if item alreay exists in the cart
         Optional<CartItem> existingCartItemOpt = cart.getItems().stream()
@@ -62,26 +58,72 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public CartResponseDTO getCartByUserId(String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCartByUserId'");
+        var user = getUserById(userId);
+        var cartOfUser = getOrCreateCartForUser(user);
+
+        return CartMapper.convertToCartResponseDTO(cartOfUser);
     }
 
     @Override
     public CartResponseDTO updateItemQuantity(String userId, CartItemRequestDTO cartItemRequestDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateItemQuantity'");
+        var user = getUserById(userId);
+        var cart = getOrCreateCartForUser(user);
+
+        var cartItem = getMatchedCartItemOfAnUser(cart, cartItemRequestDTO.foodId());
+
+        if (cartItemRequestDTO.quantity() <= 0) {
+            // remove the item
+            cart.getItems().remove(cartItem);
+        } else {
+            cartItem.setQuantity(cartItemRequestDTO.quantity());
+        }
+
+        var savedCart = cartRepository.save(cart);
+        return CartMapper.convertToCartResponseDTO(savedCart);
     }
 
     @Override
     public CartResponseDTO removeItemFromCart(String userId, String foodId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeItemFromCart'");
+        var user = getUserById(userId);
+        var cart = getOrCreateCartForUser(user);
+        var cartItem = getMatchedCartItemOfAnUser(cart, foodId);
+
+        cart.getItems().remove(cartItem);
+        var savedCart = cartRepository.save(cart);
+
+        return CartMapper.convertToCartResponseDTO(savedCart);
     }
 
     @Override
-    public CartResponseDTO clearCart(String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'clearCart'");
+    public void clearCartItems(String userId) {
+        var user = getUserById(userId);
+        cartRepository.deleteByUser(user);
+    }
+
+    // helper methods
+    private CartItem getMatchedCartItemOfAnUser(Cart cart, String foodId) {
+        return cart.getItems().stream()
+                .filter(item -> item.getFood().getFoodId().equals(foodId))
+                .findFirst().orElseThrow(() -> new NoSuchElementException("Food Not Found In the Cart"));
+    }
+
+    private User getUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User not found with id " + userId));
+    }
+
+    private Cart getOrCreateCartForUser(User user) {
+        return cartRepository.findByUser(user).orElseGet(
+                () -> {
+                    var newCart = new Cart();
+                    newCart.setUser(user);
+                    return cartRepository.save(newCart);
+                });
+    }
+
+    private Food getFoodById(String foodId) {
+        return foodRepository.findById(foodId)
+                .orElseThrow(() -> new NoSuchElementException("Food not found with id " + foodId));
     }
 
 }
