@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class OrderItems {
+public class OrderItem {
  @Id
  @GeneratedValue(strategy = GenerationType.UUID)
  private String orderItemId;
@@ -26,6 +26,6 @@ public class OrderItems {
  private Order order;
 
  private String foodName;
- private String foodPrice;
+ private double foodPrice;
  private int quantity;
 }

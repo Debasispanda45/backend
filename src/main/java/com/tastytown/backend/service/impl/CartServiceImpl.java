@@ -11,10 +11,10 @@ import com.tastytown.backend.entity.Cart;
 import com.tastytown.backend.entity.CartItem;
 import com.tastytown.backend.entity.Food;
 import com.tastytown.backend.entity.User;
+import com.tastytown.backend.helper.UserServiceHelper;
 import com.tastytown.backend.mapper.CartMapper;
 import com.tastytown.backend.repository.CartRepository;
 import com.tastytown.backend.repository.FoodRepository;
-import com.tastytown.backend.repository.UserRepository;
 import com.tastytown.backend.service.ICartService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,12 +23,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CartServiceImpl implements ICartService {
     private final CartRepository cartRepository;
-    private final UserRepository userRepository;
     private final FoodRepository foodRepository;
+    private final UserServiceHelper userServiceHelper;
 
     @Override
     public CartResponseDTO addItemToCart(String userId, CartItemRequestDTO cartItemRequestDTO) {
-        var user = getUserById(userId);
+        var user = userServiceHelper.getUserById(userId);
         var cart = getOrCreateCartForUser(user);
         var food = getFoodById(cartItemRequestDTO.foodId());
 
@@ -58,7 +58,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public CartResponseDTO getCartByUserId(String userId) {
-        var user = getUserById(userId);
+        var user = userServiceHelper.getUserById(userId);
         var cartOfUser = getOrCreateCartForUser(user);
 
         return CartMapper.convertToCartResponseDTO(cartOfUser);
@@ -66,7 +66,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public CartResponseDTO updateItemQuantity(String userId, CartItemRequestDTO cartItemRequestDTO) {
-        var user = getUserById(userId);
+        var user = userServiceHelper.getUserById(userId);
         var cart = getOrCreateCartForUser(user);
 
         var cartItem = getMatchedCartItemOfAnUser(cart, cartItemRequestDTO.foodId());
@@ -84,7 +84,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public CartResponseDTO removeItemFromCart(String userId, String foodId) {
-        var user = getUserById(userId);
+        var user = userServiceHelper.getUserById(userId);
         var cart = getOrCreateCartForUser(user);
         var cartItem = getMatchedCartItemOfAnUser(cart, foodId);
 
@@ -96,7 +96,7 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public void clearCartItems(String userId) {
-        var user = getUserById(userId);
+        var user = userServiceHelper.getUserById(userId);
         cartRepository.deleteByUser(user);
     }
 
@@ -105,11 +105,6 @@ public class CartServiceImpl implements ICartService {
         return cart.getItems().stream()
                 .filter(item -> item.getFood().getFoodId().equals(foodId))
                 .findFirst().orElseThrow(() -> new NoSuchElementException("Food Not Found In the Cart"));
-    }
-
-    private User getUserById(String userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found with id " + userId));
     }
 
     private Cart getOrCreateCartForUser(User user) {
